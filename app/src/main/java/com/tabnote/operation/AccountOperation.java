@@ -16,7 +16,7 @@ public class AccountOperation {
         OutputStream os;
         InputStream is;
         BufferedReader br;
-        URL url = new URL(Set.ip+"account");
+        URL url = new URL(Set.ip + "account");
         connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setConnectTimeout(8000);
@@ -46,9 +46,10 @@ public class AccountOperation {
         JSONObject jsonObject = new JSONObject();
         try {
             JSONObject send = new JSONObject();
-            send.put("mesType", MesType.logIn);
+            String pwd = Cryptic.getDynamicPublicKeyAndEncrypt(password);
+            send.put("mesType",MesType.logIn);
             send.put("id",id);
-            send.put("password",password);
+            send.put("password",pwd);
             jsonObject = post(send);
             return jsonObject;
         } catch (IOException | NullPointerException e) {
@@ -69,7 +70,7 @@ public class AccountOperation {
             send.put("mesType",MesType.signUp);
             send.put("name",name);
             send.put("id",id);
-            send.put("password",password);
+            send.put("password",Cryptic.getDynamicPublicKeyAndEncrypt(password));
             jsonObject = post(send);
             return jsonObject;
         } catch (IOException | NullPointerException e) {
@@ -105,7 +106,7 @@ public class AccountOperation {
         JSONObject json = new JSONObject();
 
         jsonObject.put("mesType",MesType.resetName);
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         jsonObject.put("name",name);
         try {
             json = post(jsonObject);
@@ -123,7 +124,7 @@ public class AccountOperation {
         JSONObject jsonObject = new JSONObject();
         JSONObject json = new JSONObject();
         jsonObject.put("mesType",MesType.resetID);
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         jsonObject.put("id",id);
         try {
             json = post(jsonObject);
@@ -159,7 +160,7 @@ public class AccountOperation {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("mesType",MesType.getTokensById);
         jsonObject.put("id",id);
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         JSONObject json = new JSONObject();
         try{
             json = post(jsonObject);

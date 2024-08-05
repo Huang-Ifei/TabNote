@@ -48,7 +48,7 @@ public class NoteOperation {
         JSONArray jsonArray = null;
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         jsonObject.put("id",id);
         jsonObject.putArray("plans");
         for(int i=0;i<list.size();i++){
@@ -75,7 +75,7 @@ public class NoteOperation {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("plan_id",plan_id);
         jsonObject.put("id",usr_id);
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         jsonObject.put("content",content);
         jsonObject.put("link",link);
         jsonObject.put("date",date);
@@ -88,7 +88,7 @@ public class NoteOperation {
     public static void finishNote(Contact contact,String id,String token){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id",id);
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         jsonObject.put("plan_id",contact.getId());
         jsonObject.put("content",contact.getContext());
         jsonObject.put("link",contact.getLink());
@@ -102,7 +102,7 @@ public class NoteOperation {
 
     public static void resetNote(String id,String token,String plan_id,String new_content,String new_link,String new_date){
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         jsonObject.put("id",id);
         jsonObject.put("plan_id",plan_id);
         jsonObject.put("content",new_content);
@@ -119,7 +119,7 @@ public class NoteOperation {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id",id);
         jsonObject.put("plan_id",plan_id);
-        jsonObject.put("token",token);
+        jsonObject.put("token",Cryptic.getDynamicPublicKeyAndEncrypt(token));
         jsonObject.put("content",content);
         jsonObject.put("link",link);
         jsonObject.put("date",date);

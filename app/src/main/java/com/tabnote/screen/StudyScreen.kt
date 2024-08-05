@@ -10,7 +10,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import android.webkit.JavascriptInterface
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.tabnote.operation.Cryptic
 import com.tabnote.preferences.PreferencesDataStore
 import java.net.HttpCookie
 
@@ -26,49 +30,45 @@ fun StudyScreen() {
 
     val id = dataStore.getID.collectAsState(initial = "").value
     val token = dataStore.getToken.collectAsState(initial = "").value
+    val name = dataStore.getName.collectAsState(initial = "").value
 
     var webView by remember {
         mutableStateOf<WebView?>(null)
     }
+    CookieManager.getInstance().setCookie(url, HttpCookie("id", id).toString())
+    CookieManager.getInstance().setCookie(url, HttpCookie("encryptionToken",Cryptic.encrypt(token)).toString())
+    CookieManager.getInstance().setCookie(url, HttpCookie("name", name).toString())
+    CookieManager.getInstance().setCookie(url, HttpCookie("isApp", "true").toString())
 
-    if (!id.equals("")&& token != ""){
-        println(id+token)
+    Card(modifier = Modifier.fillMaxSize(), colors = CardDefaults.cardColors(Color(30,30,30))){
+        AndroidView(factory = {
+            WebView(it).apply {
+                settings.javaScriptEnabled = true
+                settings.domStorageEnabled = true
+                settings.setSupportMultipleWindows(true)
+                settings.allowFileAccess = true
+                settings.allowContentAccess = true
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                webViewClient = object : WebViewClient() {
 
-
-        CookieManager.getInstance().setCookie(url,HttpCookie("id",id).toString())
-        CookieManager.getInstance().setCookie(url,HttpCookie("token",token).toString())
-    }else{
-        CookieManager.getInstance().setCookie(url,HttpCookie("id","").toString())
-        CookieManager.getInstance().setCookie(url,HttpCookie("token","").toString())
-    }
-
-    AndroidView(factory = {
-        WebView(it).apply {
-            settings.javaScriptEnabled = true
-            settings.domStorageEnabled = true
-            settings.setSupportMultipleWindows(true)
-            settings.allowFileAccess = true
-            settings.allowContentAccess = true
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            webViewClient = object : WebViewClient(){
-
+                }
+                loadUrl(url)
+                webView?.addJavascriptInterface(
+                    CookieManagerWrapper(),
+                    "CookieManager"
+                )
             }
-            loadUrl(url)
-            webView?.addJavascriptInterface(
-                CookieManagerWrapper(),
-                "CookieManager"
-            )
-        }
-    }, update = {
-        webView?.loadUrl(url)
-    }, modifier = Modifier
-        .fillMaxSize()
-        .statusBarsPadding()
-        .navigationBarsPadding())
-
+        }, update = {
+            webView?.loadUrl(url)
+        }, modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+        )
+    }
 
 }
 
@@ -85,18 +85,3 @@ class CookieManagerWrapper {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

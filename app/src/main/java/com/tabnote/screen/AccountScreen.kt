@@ -18,6 +18,7 @@ import com.tabnote.module.CheckInButton
 import com.tabnote.module.PasswordInput
 import com.tabnote.module.TextInput
 import com.tabnote.operation.AccountOperation
+import com.tabnote.operation.Cryptic
 import com.tabnote.preferences.PreferencesDataStore
 import com.tabnote.ui.theme.BrushColor
 import kotlinx.coroutines.CoroutineScope
@@ -126,19 +127,24 @@ fun loginOrSignup(name:String, id:String,password:String, doing:String,message:(
     if (doing.equals("登录")) {
         val t = Thread {
             message ("发送中...")
-            val mes = AccountOperation.login(id, password)
-            if (mes.getString("response").equals("success")) {
-                message ("成功登录")
-                Thread.sleep(200)
-                scope.launch {
-                    dataStore.saveName(mes.getString("name"))
-                    dataStore.saveID(id)
-                    dataStore.savePassWord(password)
-                    dataStore.saveWS(false)
-                    dataStore.saveToken(mes.getString("token"))
+            try{
+                val mes = AccountOperation.login(id, password)
+                if (mes.getString("response").equals("success")) {
+                    message ("成功登录")
+                    Thread.sleep(200)
+                    scope.launch {
+                        dataStore.saveName(mes.getString("name"))
+                        dataStore.saveID(id)
+                        dataStore.savePassWord(password)
+                        dataStore.saveWS(false)
+                        val tk = mes.getString("token")
+                        dataStore.saveToken(Cryptic.decrypt(tk))
+                    }
+                }else{
+                    message(mes.getString("response"))
                 }
-            }else{
-                message(mes.getString("response"))
+            }catch (e:Exception){
+                e.printStackTrace()
             }
         }
         t.start()
@@ -154,7 +160,8 @@ fun loginOrSignup(name:String, id:String,password:String, doing:String,message:(
                     dataStore.saveID(id)
                     dataStore.savePassWord(password)
                     dataStore.saveWS(false)
-                    dataStore.saveToken(mes.getString("token"))
+                    val tk = mes.getString("token")
+                    dataStore.saveToken(Cryptic.decrypt(tk))
                 }
             }else{
                 message(mes.getString("response"))
